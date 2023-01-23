@@ -18,8 +18,9 @@ Welcome to this repository, where you will learn how to create your own Telegram
 
 ## Setting up your Flask App
 1. Clone this repository
-2. Create a `.env` file and add your Telegram bot token and OpenAI API key
-3. Create a virtual environment by running `python -m venv env`
+2. Create a `.env` file and add your Telegram bot token  OpenAI API key
+3. Optionally you can also add a OpenAI API key to enable the `/gpt` command
+3. Create a virtual environment by running `python3 -m venv env`
 4. Activate the virtual environment by running `source env/bin/activate`
 5. Install the required packages by running `pip install -r requirements.txt`
 6. Visit the [telebot docs](https://pytba.readthedocs.io/en/latest/quick_start.html) to get a rundown on how to make more complex responses.
@@ -35,9 +36,8 @@ Welcome to this repository, where you will learn how to create your own Telegram
 7. Run `vercel deploy` to deploy the application as a preview
 
 ## Setting up Webhooks
-1. Open the Telegram app and search for your bot
-2. Send the command `/setwebhook` to set the webhook URL for your bot (or run `python app.py`)
-3. Use the URL of your Vercel-deployed app as the webhook URL
+
+1. Run the `app.py` script use the URL of your Vercel-deployed app as the webhook URL
 
 ## Implementing GPT-3
 1. In the `app.py` file, import the OpenAI package and Telebot package
