@@ -7,10 +7,11 @@ import openai
 
 openai.api_key = os.getenv("OPENAI_TOKEN", None)
 
+
 def respond(msg):
     """
     Generate a response to a user-provided message
-    
+
     Args:
         msg (str): The message to respond to
 
@@ -19,7 +20,9 @@ def respond(msg):
     """
 
     if openai.api_key is None:
-        response = "OpenAI API Key not found. Please set the OPENAI_TOKEN environment variable"
+        response = (
+            "OpenAI API Key not found. Please set the OPENAI_TOKEN environment variable"
+        )
         return response
 
     # Generate a prompt based on the user-provided message, feel free to change this.
@@ -42,5 +45,5 @@ def respond(msg):
     )
 
     # Generate a response to the user-provided message
-    response = gpt3_session.choices[0].text  
+    response = gpt3_session.choices[0].text
     return response
