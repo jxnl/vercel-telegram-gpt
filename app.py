@@ -35,26 +35,6 @@ def webhook():
     else:
         flask.abort(403)
 
-@app.route("/assemblyai_callback_webhook", methods=["POST"])
-def assemblyai_callback_webhook():
-    """ This is the webhook that Assembly AI calls when a transcript is ready 
-    """
-    # TODO set up statefulness so we can use this instead of the polling method
-    # We need the chat_id to be associated with it.
-
-    # Get the JSON response
-    json_response = flask.request.get_json()
-
-    # Get the transcript ID
-    if json_response["status"] == "completed":
-        transcript_id = json_response["transcript_id"]
-
-    else:
-        print("The Assembly AI webhook was called but the status was not completed")
-        print(json_response)
-        return
-
-
 # Handle '/start' and '/help'
 @bot.message_handler(commands=["help", "start"])
 def send_welcome(message):
@@ -78,9 +58,14 @@ def voice_processing(message):
     # GET from this url https://johnmcdonnell--telegram-transcribe.modal.run  passing in file_id as an argument
     # This will return a JSON response with the transcript
     # We can then send that to the user
-    response = requests.get(f'https://johnmcdonnell--telegram-transcribe.modal.run?file_id={file_id}')
+    bot.send_message(message.chat.id, 'Attempting to transcribe!')
 
-    bot.send_message(message.chat.id, response)
+    response = requests.get(f'https://johnmcdonnell--telegram-transcribe.modal.run?file_id={file_id}')
+    if response.status_code == 200 and response.json()['text']:
+        bot.reply_to(message, response.json()['text'])
+    else:
+        bot.reply_to(message, 'Sorry, transcription failed')
+
 
 
 
