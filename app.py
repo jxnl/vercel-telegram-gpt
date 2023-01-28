@@ -131,7 +131,7 @@ def voice_processing(message):
             return None
     except Exception as e:
         bot.send_message(message.chat.id, "Sorry, there was an error submitting your voice message")
-        bot.send_message(message.chat.id, e)
+        print(e)
         return None
 
     try:
@@ -153,7 +153,7 @@ def voice_processing(message):
             bot.reply_to(message, transcript_text)
     except Exception as e:
         bot.send_message(message.chat.id, "Sorry, there was an error getting the transcript")
-        bot.send_message(message.chat.id, e)
+        print(e)
         return None
 
 
