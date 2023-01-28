@@ -9,11 +9,12 @@ import gpt
 
 import flask
 import telebot
+from telebot.async_telebot import AsyncTeleBot
 
 
 app = flask.Flask(__name__)
 
-bot = telebot.AsyncTeleBot(os.environ["TELEGRAM_TOKEN"])
+bot = AsyncTeleBot(os.environ["TELEGRAM_TOKEN"])
 
 WEBHOOK_URL = "https://overheardbot.vercel.app"
 
@@ -71,7 +72,7 @@ async def send_welcome(message):
         """,
     )
 
-def poll_for_transcript_completion(chat_id, transcript_id):
+async def poll_for_transcript_completion(chat_id, transcript_id):
     """ Polls the Assembly AI API for completion of the transcript """
 
     # Get the API key from the environment variable
@@ -127,7 +128,7 @@ async def voice_processing(message):
     # Now request the transcript
     endpoint = "https://api.assemblyai.com/v2/transcript"
     json = { "audio_url": upload_url,
-            "webhook_url": f"{WEBHOOK_URL}/assemblyai_callback_webhook",
+            "webhook_url": f"{WEBHOOK_URL}/assemblyai_callback_webhook" }
     headers = {
         "authorization": os.environ["ASSEMBLY_AI_TOKEN"]
     }
