@@ -71,90 +71,16 @@ def send_welcome(message):
         """,
     )
 
-def poll_for_transcript_completion(chat_id, transcript_id):
-    """ Polls the Assembly AI API for completion of the transcript """
-
-    # Get the API key from the environment variable
-    api_key = os.environ["ASSEMBLY_AI_API_KEY"]
-
-    # Set the headers
-    headers = {"authorization": api_key}
-
-    time_elapsed = 0
-    while True:
-        if time_elapsed > 60 * 5:
-            bot.send_message(chat_id, 'Transcription timed out, sorry')
-            return None
-        # Get the transcript
-        response = requests.get(
-            f"https://api.assemblyai.com/v2/transcript/{transcript_id}", headers=headers
-        )
-
-        # Get the JSON response
-        json_response = response.json()
-
-        # If the transcript is complete
-        if json_response["status"] == "completed":
-            return json_response
-        elif json_response["status"] == "error":
-            bot.send_message(chat_id, 'There was an error with the transcription')
-        else:
-            time.sleep(0.25)
-            time_elapsed += 0.25
-    return None
-
 @bot.message_handler(content_types=['voice'])
 def voice_processing(message):
-    try:
-        # Download the voice message
-        file_info = bot.get_file(message.voice.file_id)
-        downloaded_file = bot.download_file(file_info.file_path)
-        bot.send_message(message.chat.id, "Processing your voice message...")
-    
-    except:
-        bot.send_message(message.chat.id, "Sorry, there was an error downloading your voice message")
-        return None
-    
-    try:
-        # Upload voice message to Assembly AI
-        headers = {'authorization': os.environ["ASSEMBLY_AI_TOKEN"]}
-        response = requests.post('https://api.assemblyai.com/v2/upload',
-                                headers=headers,
-                                data=downloaded_file)
-        print(response.json())
-        if 'upload_url' in response.json():
-            upload_url = response.json()['upload_url']
-        else:
-            print('Error uploading file to Assembly AI')
-            print(response.json())
-            bot.send_message(message.chat.id, "Error uploading file to Assembly AI")
-            return None
-    except Exception as e:
-        bot.send_message(message.chat.id, "Sorry, there was an error submitting your voice message")
-        print(e)
-        return None
+    file_info = bot.get_file(message.voice.file_id)
+    file_id = file_info.file_id
+    # GET from this url https://johnmcdonnell--telegram-transcribe.modal.run  passing in file_id as an argument
+    # This will return a JSON response with the transcript
+    # We can then send that to the user
+    response = requests.get(f'https://johnmcdonnell--telegram-transcribe.modal.run?file_id={file_id}')
 
-    try:
-        # Now request the transcript
-        endpoint = "https://api.assemblyai.com/v2/transcript"
-        json = { "audio_url": upload_url,
-                "webhook_url": f"{WEBHOOK_URL}/assemblyai_callback_webhook" }
-        headers = {
-            "authorization": os.environ["ASSEMBLY_AI_TOKEN"]
-        }
-        response = requests.post(endpoint, json=json, headers=headers)
-        print(response.json())
-        
-        # Get the transcript ID
-        completion = poll_for_transcript_completion(message.chat.id, response.json())
-        if completion:
-            print(completion)
-            transcript_text = completion['text']
-            bot.reply_to(message, transcript_text)
-    except Exception as e:
-        bot.send_message(message.chat.id, "Sorry, there was an error getting the transcript")
-        print(e)
-        return None
+    bot.send_message(message.chat.id, response)
 
 
 
