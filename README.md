@@ -1,20 +1,8 @@
-# Telegram Bot using Flask, Webhooks, and Vercel
+# Overheard bot
+Telegram bot enabling voice journaling.
 
-Welcome to this repository, where you will learn how to create your own Telegram bot using Flask, Telegram's Webhooks, and use Vercel for deployment.
+Forked from @jxnl's repo, jxnl/vercel-telegram-gpt.
 
-## Prerequisites
-- A Telegram account and the Telegram app installed on your device
-- A Vercel account
-- Basic knowledge of Python and Flask
-- OpenAI API key
-- Telebot package
-- Node.js and npm installed
-
-## Setting up your Telegram Bot
-1. Open the Telegram app and search for `@BotFather`
-2. Send the command `/newbot` to create a new bot
-3. Follow the prompts to set a name and username for your bot
-4. Save the generated token, as you will need it later
 
 ## Setting up your Flask App
 1. Clone this repository
