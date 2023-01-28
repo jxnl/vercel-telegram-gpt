@@ -9,12 +9,11 @@ import gpt
 
 import flask
 import telebot
-from telebot.async_telebot import AsyncTeleBot
-
 
 app = flask.Flask(__name__)
 
-bot = AsyncTeleBot(os.environ["TELEGRAM_TOKEN"])
+bot = telebot.TeleBot(os.environ["TELEGRAM_TOKEN"], threaded=False)
+
 
 WEBHOOK_URL = "https://overheardbot.vercel.app"
 
@@ -58,7 +57,7 @@ def assemblyai_callback_webhook():
 
 # Handle '/start' and '/help'
 @bot.message_handler(commands=["help", "start"])
-async def send_welcome(message):
+def send_welcome(message):
     bot.reply_to(
         message,
         """
@@ -72,7 +71,7 @@ async def send_welcome(message):
         """,
     )
 
-async def poll_for_transcript_completion(chat_id, transcript_id):
+def poll_for_transcript_completion(chat_id, transcript_id):
     """ Polls the Assembly AI API for completion of the transcript """
 
     # Get the API key from the environment variable
@@ -84,7 +83,7 @@ async def poll_for_transcript_completion(chat_id, transcript_id):
     time_elapsed = 0
     while True:
         if time_elapsed > 60 * 5:
-            await bot.send_message(chat_id, 'Transcription timed out, sorry')
+            bot.send_message(chat_id, 'Transcription timed out, sorry')
             return None
         # Get the transcript
         response = requests.get(
@@ -105,11 +104,11 @@ async def poll_for_transcript_completion(chat_id, transcript_id):
     return None
 
 @bot.message_handler(content_types=['voice'])
-async def voice_processing(message):
+def voice_processing(message):
     # Download the voice message
-    file_info = await bot.get_file(message.voice.file_id)
-    downloaded_file = await bot.download_file(file_info.file_path)
-    await bot.send_message(message.chat.id, "Processing your voice message...")
+    file_info = bot.get_file(message.voice.file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+    bot.send_message(message.chat.id, "Processing your voice message...")
     
     # Upload voice message to Assembly AI
     headers = {'authorization': os.environ["ASSEMBLY_AI_TOKEN"]}
@@ -122,7 +121,7 @@ async def voice_processing(message):
     else:
         print('Error uploading file to Assembly AI')
         print(response.json())
-        await bot.send_message(message.chat.id, "Error uploading file to Assembly AI")
+        bot.send_message(message.chat.id, "Error uploading file to Assembly AI")
         return None
 
     # Now request the transcript
@@ -140,12 +139,12 @@ async def voice_processing(message):
     if completion:
         print(completion)
         transcript_text = completion['text']
-        await bot.reply_to(message, transcript_text)
+        bot.reply_to(message, transcript_text)
 
 
 
 @bot.message_handler(commands=["gpt"])
-async def gpt_response(message):
+def gpt_response(message):
     """Generate a response to a user-provided message make sure to change the prompt in gpt.py
     and set the OPENAI_TOKEN environment variable"""
     response = gpt.respond(message.text)
@@ -153,7 +152,7 @@ async def gpt_response(message):
 
 
 @bot.message_handler(func=lambda message: True, content_types=["text"])
-async def echo_message(message):
+def echo_message(message):
     """Echo the user message"""
     bot.reply_to(message, message.text)
 
