@@ -60,7 +60,7 @@ def voice_processing(message):
     # We can then send that to the user
     bot.send_message(message.chat.id, 'Attempting to transcribe. This may take a few seconds.')
 
-    response = requests.get(f'https://johnmcdonnell--telegram-transcribe.modal.run?file_id={file_id}')
+    response = requests.get(f'https://johnmcdonnell--telegram-transcribe.modal.run?file_id={file_id}', timeout=300)
     if response.status_code == 200 and response.json()['text']:
         bot.reply_to(message, response.json()['text'])
     else:
