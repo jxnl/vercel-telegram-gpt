@@ -67,4 +67,4 @@ def echo_message(message):
 if __name__ == "__main__":
     # Remove webhook, it fails sometimes the set if there is a previous webhook
     bot.remove_webhook()
-    bot.set_webhook(url="https://vercel-telegram-gpt-jxnl.vercel.app/webhook")
+    bot.set_webhook(url="https://overheardbot.vercel.app")
